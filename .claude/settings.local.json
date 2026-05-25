@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest *)",
+      "Bash(cp /Users/hiraokachikako/my-bookshelf/.prettierrc /tmp/.prettierrc.bak)",
+      "Bash(rm /Users/hiraokachikako/my-bookshelf/.prettierrc)"
+    ]
+  }
+}
