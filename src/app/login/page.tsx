@@ -28,7 +28,8 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Session creation failed");
       router.push("/");
     } catch (e) {
-      setError("ログインに失敗しました。もう一度お試しください。");
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(`ログインに失敗しました: ${msg}`);
       console.error(e);
     } finally {
       setLoading(false);
