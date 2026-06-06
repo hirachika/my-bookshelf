@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { IconButton } from "@chakra-ui/react";
 import { RiLogoutBoxLine } from "react-icons/ri";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function SignOutButton() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function SignOutButton() {
 
   const handleSignOut = async () => {
     setLoading(true);
-    await signOut(auth);
+    await signOut(getFirebaseAuth());
     await fetch("/api/auth/session", { method: "DELETE" });
     router.push("/login");
   };

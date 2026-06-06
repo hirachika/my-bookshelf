@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithPopup } from "firebase/auth";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
-import { auth, googleProvider } from "@/lib/firebase";
+import { getFirebaseAuth, googleProvider } from "@/lib/firebase";
 import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(getFirebaseAuth(), googleProvider);
       const idToken = await result.user.getIdToken();
 
       const res = await fetch("/api/auth/session", {
