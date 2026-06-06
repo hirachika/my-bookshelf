@@ -3,7 +3,37 @@
     "allow": [
       "Bash(npx create-next-app@latest *)",
       "Bash(cp /Users/hiraokachikako/my-bookshelf/.prettierrc /tmp/.prettierrc.bak)",
-      "Bash(rm /Users/hiraokachikako/my-bookshelf/.prettierrc)"
+      "Bash(rm /Users/hiraokachikako/my-bookshelf/.prettierrc)",
+      "Bash(cp /tmp/.prettierrc.bak /Users/hiraokachikako/my-bookshelf/.prettierrc)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"require\\('/Users/hiraokachikako/my-bookshelf/node_modules/recharts'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3491/)",
+      "Bash(npx playwright *)",
+      "Bash(node /tmp/pw-test.mjs)",
+      "Bash(curl -s \"https://www.googleapis.com/books/v1/volumes?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3&maxResults=3\")",
+      "Bash(python3 -c \"import sys, json; d=json.load\\(sys.stdin\\); print\\('totalItems:', d.get\\('totalItems'\\)\\); print\\('first:', d.get\\('items', [{}]\\)[0].get\\('volumeInfo', {}\\).get\\('title', 'N/A'\\)\\)\")",
+      "Bash(curl -sv \"https://www.googleapis.com/books/v1/volumes?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3&maxResults=3\")",
+      "Bash(curl -s \"https://www.googleapis.com/books/v1/volumes?q=natsume+soseki&maxResults=3\")",
+      "Bash(python3 -c \"import sys, json; d=json.load\\(sys.stdin\\); print\\('totalItems:', d.get\\('totalItems'\\)\\); [print\\(i.get\\('volumeInfo', {}\\).get\\('title', 'N/A'\\)\\) for i in d.get\\('items', []\\)]\")",
+      "Bash(curl -s \"http://localhost:3491/api/search?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3\")",
+      "Bash(python3 -c ' *)",
+      "Bash(pkill -f \"next dev --port 3491\")",
+      "Bash(npx tsc *)",
+      "Bash(python3 -c \"import sys,json; books=json.load\\(sys.stdin\\); print\\(f'{len\\(books\\)} books in DB'\\); [print\\(f'  {b[\\\\\"id\\\\\"]}: {b[\\\\\"title\\\\\"]}'\\) for b in books]\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3492/)",
+      "Bash(kill 34559)",
+      "Bash(pkill -f \"next dev --port 3492\")",
+      "Bash(curl -s \"http://localhost:3493/api/search?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -sv \"http://localhost:3493/api/search?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3\")",
+      "Bash(curl -s \"http://localhost:3000/api/search?q=%E5%A4%8F%E7%9B%AE%E6%BC%B1%E7%9F%B3\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(npx next *)",
+      "Bash(node -e \"const {parseDate} = require\\('@internationalized/date'\\); console.log\\(parseDate\\('2024-01-15'\\).toString\\(\\)\\)\")",
+      "Bash(node -e \"import\\('@internationalized/date'\\).then\\(m => console.log\\(m.parseDate\\('2024-01-15'\\).toString\\(\\)\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; books=json.load\\(sys.stdin\\); [print\\(b['id'], b.get\\('categories',[]\\)\\) for b in books]\")",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(p.dependencies.firebase, p.dependencies['firebase-admin']\\)\")"
     ]
   }
 }
