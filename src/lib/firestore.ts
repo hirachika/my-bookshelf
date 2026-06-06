@@ -1,8 +1,8 @@
-import { adminDb } from './firebase-admin';
+import { getAdminDb } from './firebase-admin';
 import type { Book } from '@/types/book';
 
 function booksRef(uid: string) {
-  return adminDb.collection('users').doc(uid).collection('books');
+  return getAdminDb().collection('users').doc(uid).collection('books');
 }
 
 export async function getBooks(uid: string): Promise<Book[]> {

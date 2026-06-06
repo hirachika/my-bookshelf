@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebase-admin';
+import { getAdminAuth } from '@/lib/firebase-admin';
+
+export const dynamic = 'force-dynamic';
 
 const SESSION_COOKIE = '__session';
 const SESSION_DURATION_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
@@ -12,7 +14,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing idToken' }, { status: 400 });
   }
 
-  const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+  const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
     expiresIn: SESSION_DURATION_MS,
   });
 

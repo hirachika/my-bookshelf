@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { adminAuth } from '@/lib/firebase-admin';
+import { getAdminAuth } from '@/lib/firebase-admin';
 import { addBook, deleteBook, getBooks, updateBook } from '@/lib/firestore';
 import type { Book, BookStatus } from '@/types/book';
 
@@ -80,7 +80,7 @@ async function getCurrentUserId(): Promise<string> {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
   if (!sessionCookie) throw new Error('Unauthorized');
-  const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+  const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
   return decoded.uid;
 }
 

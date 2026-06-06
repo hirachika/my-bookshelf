@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { adminAuth } from '@/lib/firebase-admin';
+import { getAdminAuth } from '@/lib/firebase-admin';
 import { getBooks } from '@/lib/firestore';
 import Dashboard from '@/components/Dashboard';
 
@@ -14,7 +14,7 @@ export default async function Home() {
 
   let uid: string;
   try {
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     uid = decoded.uid;
   } catch {
     redirect('/login');
