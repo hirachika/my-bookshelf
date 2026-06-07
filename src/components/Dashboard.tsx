@@ -75,6 +75,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
           as="main"
           maxW="2xl"
           mx="auto"
+          px="2"
           pt="96px"
           minH="100vh"
           bg="white"
@@ -90,7 +91,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
             <BookshelfList books={books} />
           </Tabs.Content>
 
-          <Tabs.Content value="search" p="4">
+          <Tabs.Content value="search">
             <Stack gap="6">
               <Box as="section">
                 <Heading as="h2" size="md" mb="3">
@@ -108,7 +109,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
             </Stack>
           </Tabs.Content>
 
-          <Tabs.Content value="graph" p="4">
+          <Tabs.Content value="graph">
             <ReadingGraph books={books} />
           </Tabs.Content>
         </Box>

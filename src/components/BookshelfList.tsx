@@ -108,7 +108,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
   return (
     <Box>
       {/* フィルターボタン */}
-      <Flex gap="1" px="2" flexWrap="wrap">
+      <Flex gap="1" py="2" flexWrap="wrap">
         {FILTERS.map((f) => (
           <Button
             key={f.value}
@@ -128,7 +128,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
         ))}
       </Flex>
 
-      <Flex direction="column" gap="1.5" p="3">
+      <Flex direction="column" gap="2">
         {filtered.length === 0
           ? empty
           : filtered.map((book) => (

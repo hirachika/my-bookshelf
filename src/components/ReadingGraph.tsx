@@ -62,18 +62,24 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
   const { data, avg, totalRead, thisYearRead } = useMemo(() => buildChartData(books), [books]);
 
   return (
-    <Box bg="white" rounded="lg" p="12px" display="flex" flexDirection="column" gap="12px">
+    <Box bg="white" rounded="lg" py="4" px="2" display="flex" flexDirection="column" gap="1">
       <Text as="span" fontWeight="bold" color="gray.700">
         今年読み終わった本：{thisYearRead}冊
       </Text>
-      <Flex gap="1rem" fontSize="sm" color="gray.500">
+      <Flex gap="4" fontSize="sm" color="gray.500">
         <Text>これまでに読んだ本：{totalRead}冊</Text>
         <Text>月平均：{avg.toFixed(1)}冊</Text>
       </Flex>
 
       <ResponsiveContainer width="100%" height={130}>
         <BarChart data={data} margin={{ top: 16, right: 0, left: 0, bottom: 0 }} barCategoryGap="25%">
-          <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+          <XAxis
+            dataKey="month"
+            tick={{ fontSize: 7, fill: "#94a3b8" }}
+            axisLine={false}
+            tickLine={false}
+            interval={0}
+          />
           <Bar dataKey="count" radius={[4, 4, 0, 0]} label={<BarLabel />}>
             {data.map((entry, i) => (
               <Cell key={i} fill={entry.isCurrent ? "#ea580c" : "#fdba74"} opacity={entry.isCurrent ? 1 : 0.5} />
