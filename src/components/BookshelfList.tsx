@@ -4,9 +4,11 @@ import { useState, useTransition } from "react";
 import { Badge, Box, Button, Flex, IconButton, Image, NativeSelect, Text } from "@chakra-ui/react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { changeStatus, deleteFromShelf, updateFinishedAt, updateRating } from "@/app/actions";
+import dynamic from "next/dynamic";
 import StarRating from "./StarRating";
-import FinishedAtPicker from "./FinishedAtPicker";
 import type { Book, BookStatus } from "@/types/book";
+
+const FinishedAtPicker = dynamic(() => import("./FinishedAtPicker"), { ssr: false });
 
 const FILTERS: Array<{ value: BookStatus | "all"; label: string }> = [
   { value: "all", label: "全て" },
@@ -15,8 +17,6 @@ const FILTERS: Array<{ value: BookStatus | "all"; label: string }> = [
   { value: "read", label: "読了" },
   { value: "dropped", label: "挫折" },
 ];
-
-const TABLE_HEADERS = ["", "タイトル / 著者", "評価", "読了日", "ステータス", ""];
 
 export default function BookshelfList({ books }: { books: Book[] }) {
   const [filter, setFilter] = useState<BookStatus | "all">("all");
@@ -138,7 +138,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                   src={thumbSrc(book)}
                   alt={book.title}
                   w="54px"
-                  fit="100%"
+                  fit="cover"
                   flexShrink={0}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
