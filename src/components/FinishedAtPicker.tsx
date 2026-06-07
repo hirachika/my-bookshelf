@@ -8,9 +8,10 @@ interface Props {
   value: string | null;
   onChange: (value: string | null) => void;
   disabled?: boolean;
+  width?: string;
 }
 
-export default function FinishedAtPicker({ value, onChange, disabled = false }: Props) {
+export default function FinishedAtPicker({ value, onChange, disabled = false, width = "140px" }: Props) {
   const parsed: DateValue[] = value ? [parseDate(value.slice(0, 10))] : [];
 
   const handleChange = (details: { value: DateValue[] }) => {
@@ -27,7 +28,7 @@ export default function FinishedAtPicker({ value, onChange, disabled = false }: 
       locale="ja-JP"
       colorPalette="orange"
       positioning={{ placement: "bottom-start" }}
-      width="140px"
+      width={width}
     >
       <DatePicker.Control>
         <InputGroup
@@ -37,7 +38,7 @@ export default function FinishedAtPicker({ value, onChange, disabled = false }: 
             </DatePicker.Trigger>
           }
         >
-          <DatePicker.Input px="2" py="2" fontSize="sm" color="gray.700" />
+          <DatePicker.Input p="1" fontSize="sm" color="gray.700" />
         </InputGroup>
       </DatePicker.Control>
       <DatePicker.Positioner>

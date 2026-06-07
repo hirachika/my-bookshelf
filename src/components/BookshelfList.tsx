@@ -16,6 +16,8 @@ const FILTERS: Array<{ value: BookStatus | "all"; label: string }> = [
   { value: "dropped", label: "挫折" },
 ];
 
+const TABLE_HEADERS = ["", "タイトル / 著者", "評価", "読了日", "ステータス", ""];
+
 export default function BookshelfList({ books }: { books: Book[] }) {
   const [filter, setFilter] = useState<BookStatus | "all">("all");
   const [isPending, startTransition] = useTransition();
@@ -59,9 +61,54 @@ export default function BookshelfList({ books }: { books: Book[] }) {
     });
   };
 
+  const thumbSrc = (book: Book) => (book.thumbnail ? book.thumbnail.replace("http://", "https://") : "/no-image.jpg");
+
+  const statusSelect = (book: Book, width: string, fontSize: "sm" | "xs" = "sm") => (
+    <NativeSelect.Root disabled={isPending} width={width}>
+      <NativeSelect.Field
+        value={book.status}
+        onChange={(e) => handleStatusChange(book.id, e.target.value as BookStatus)}
+        px="2"
+        py="1.5"
+        fontSize={fontSize}
+        color="gray.700"
+        bg="white"
+      >
+        <option value="want">読みたい</option>
+        <option value="reading">読書中</option>
+        <option value="read">読了</option>
+        <option value="dropped">挫折</option>
+      </NativeSelect.Field>
+      <NativeSelect.Indicator />
+    </NativeSelect.Root>
+  );
+
+  const deleteBtn = (book: Book) => (
+    <IconButton
+      onClick={() => handleDelete(book.id, book.title)}
+      disabled={isPending}
+      aria-label="削除"
+      variant="ghost"
+      size="xs"
+      color="gray.300"
+      _hover={{ color: "red.400" }}
+    >
+      <RiDeleteBin6Line />
+    </IconButton>
+  );
+
+  const empty = (
+    <Box py="12" textAlign="center">
+      <Text color="gray.300" fontSize="sm">
+        まだ本がありません
+      </Text>
+    </Box>
+  );
+
   return (
     <Box>
-      <Flex gap="2" px="3" pt="3" pb="1" flexWrap="wrap">
+      {/* フィルターボタン */}
+      <Flex gap="1" px="2" flexWrap="wrap">
         {FILTERS.map((f) => (
           <Button
             key={f.value}
@@ -71,7 +118,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
             bg={filter === f.value ? undefined : "white"}
             size="xs"
             borderRadius="full"
-            px="3"
+            px="2"
           >
             {f.label}
             <Text as="span" ml="1" opacity={filter === f.value ? 0.7 : 0.5} fontSize="xs">
@@ -81,101 +128,66 @@ export default function BookshelfList({ books }: { books: Book[] }) {
         ))}
       </Flex>
 
-      <Flex direction="column" gap="2" p="3">
-        {filtered.length === 0 ? (
-          <Box py="12" textAlign="center">
-            <Text color="gray.300" fontSize="sm">
-              まだ本がありません
-            </Text>
-          </Box>
-        ) : (
-          filtered.map((book) => (
-            <Flex
-              key={book.id}
-              direction="row"
-              justify="space-between"
-              align="center"
-              px="12px"
-              py="15px"
-              gap="2"
-              minH="100px"
-              bg="white"
-              rounded="lg"
-            >
-              <Image
-                src={book.thumbnail ? book.thumbnail.replace("http://", "https://") : "/no-image.jpg"}
-                alt={book.title}
-                h="70px"
-                w="48px"
-                fit="cover"
-                rounded="sm"
-                flexShrink={0}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
-                }}
-              />
-
-              <Box flex="1" minW="0" overflow="hidden">
-                <Text fontSize="sm" fontWeight="bold" color="gray.800" lineHeight="tight" mb="0.5">
-                  {book.title}
-                </Text>
-                <Text fontSize="xs" color="gray.400" truncate>
-                  {book.author}
-                </Text>
-                <StarRating
-                  value={book.rating ?? null}
-                  onChange={(r) => handleRatingChange(book.id, r)}
-                  disabled={book.status !== "read"}
+      <Flex direction="column" gap="1.5" p="3">
+        {filtered.length === 0
+          ? empty
+          : filtered.map((book) => (
+              <Flex key={book.id} align="center" p="2" gap="8px" bg="white" rounded="8px">
+                {/* Image */}
+                <Image
+                  src={thumbSrc(book)}
+                  alt={book.title}
+                  w="54px"
+                  fit="100%"
+                  flexShrink={0}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
+                  }}
                 />
-                {book.categories.length > 0 && (
-                  <Flex flexWrap="wrap" gap="1" mt="0.5">
-                    {book.categories.slice(0, 2).map((cat) => (
-                      <Badge key={cat} colorPalette="orange" variant="subtle" size="sm">
-                        {cat}
-                      </Badge>
-                    ))}
+
+                <Flex flex="1" direction="column">
+                  <Flex gap="2" alignItems="center">
+                    <Box w="full">
+                      <Text fontSize="sm" fontWeight="bold" color="gray.800">
+                        {book.title}
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {book.author}
+                      </Text>
+                    </Box>
+                    {/* 削除ボタン */}
+                    {deleteBtn(book)}
                   </Flex>
-                )}
-              </Box>
 
-              <Flex align="center" gap="1.5" flexShrink={0}>
-                <FinishedAtPicker
-                  value={book.finishedAt}
-                  onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
-                  disabled={book.status !== "read"}
-                />
-                <NativeSelect.Root disabled={isPending} width="100px">
-                  <NativeSelect.Field
-                    value={book.status}
-                    onChange={(e) => handleStatusChange(book.id, e.target.value as BookStatus)}
-                    px="2"
-                    py="2"
-                    fontSize="sm"
-                    color="gray.700"
-                    bg="white"
-                  >
-                    <option value="want">読みたい</option>
-                    <option value="reading">読書中</option>
-                    <option value="read">読了</option>
-                    <option value="dropped">挫折</option>
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
-                <IconButton
-                  onClick={() => handleDelete(book.id, book.title)}
-                  disabled={isPending}
-                  aria-label="削除"
-                  variant="ghost"
-                  size="xs"
-                  color="gray.300"
-                  _hover={{ color: "red.400" }}
-                >
-                  <RiDeleteBin6Line />
-                </IconButton>
+                  <Flex alignItems="center" justify="space-between" gap="2">
+                    <Flex direction="column" minW="0" flex="1">
+                      <Flex>
+                        {book.categories[0] && (
+                          <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0}>
+                            {book.categories[0]}
+                          </Badge>
+                        )}
+                      </Flex>
+                      <StarRating
+                        value={book.rating ?? null}
+                        onChange={(r) => handleRatingChange(book.id, r)}
+                        disabled={book.status !== "read"}
+                      />
+                    </Flex>
+
+                    <Flex gap="1" flexShrink={0} align="flex-end">
+                      {statusSelect(book, "72px", "xs")}
+                      <FinishedAtPicker
+                        value={book.finishedAt}
+                        onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
+                        disabled={book.status !== "read"}
+                        width="90px"
+                      />
+                    </Flex>
+                  </Flex>
+                </Flex>
               </Flex>
-            </Flex>
-          ))
-        )}
+            ))}
       </Flex>
     </Box>
   );

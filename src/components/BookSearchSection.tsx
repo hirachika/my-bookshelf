@@ -159,7 +159,7 @@ export default function BookSearchSection({ existingIds }: Props) {
             </Text>
           </Flex>
 
-          <SimpleGrid columns={2} gap="2" mb="6">
+          <SimpleGrid columns={1} gap="2" mb="6">
             {results.map((book) => (
               <BookCard
                 key={book.id}
