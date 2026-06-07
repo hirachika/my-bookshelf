@@ -18,7 +18,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
       <Tabs.Root defaultValue="shelf" variant="line" colorPalette="orange">
         {/* 固定ヘッダー */}
         <Box as="header" position="fixed" top="0" left="0" right="0" zIndex="10" bg="orange.500">
-          <Box maxW="2xl" mx="auto" h="48px" display="flex" alignItems="center" justifyContent="space-between">
+          <Box maxW="2xl" mx="auto" p="2" h="48px" display="flex" alignItems="center" justifyContent="space-between">
             <Heading as="h1" size="md" color="white">
               My Bookshelf
             </Heading>

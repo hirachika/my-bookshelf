@@ -27,7 +27,9 @@ export default function SignOutButton() {
       size="sm"
       color="white"
       _hover={{ bg: "orange.600" }}
+      gap="1"
     >
+      ログアウト
       <RiLogoutBoxLine />
     </IconButton>
   );
