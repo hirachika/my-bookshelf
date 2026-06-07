@@ -18,17 +18,17 @@ export async function GET(req: NextRequest) {
     const res = await fetch(url);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: err?.error?.message || `API error ${res.status}` },
-        { status: res.status },
-      );
+      const message = err?.error?.message || `API error ${res.status}`;
+      console.error('[search] Google Books API error:', res.status, message);
+      return NextResponse.json({ error: message }, { status: res.status });
     }
     const data = await res.json();
     return NextResponse.json({
       items: data.items || [],
       totalItems: data.totalItems ?? 0,
     });
-  } catch {
+  } catch (e) {
+    console.error('[search] fetch failed:', e);
     return NextResponse.json({ error: 'Network error' }, { status: 500 });
   }
 }

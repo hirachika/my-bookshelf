@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
     const item = data.items?.[0] ?? null;
     return NextResponse.json({ item });
-  } catch {
+  } catch (e) {
+    console.error('[isbn] fetch failed:', e);
     return NextResponse.json({ error: 'Network error' }, { status: 500 });
   }
 }

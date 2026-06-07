@@ -14,20 +14,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing idToken' }, { status: 400 });
   }
 
-  const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
-    expiresIn: SESSION_DURATION_MS,
-  });
+  try {
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+      expiresIn: SESSION_DURATION_MS,
+    });
 
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, sessionCookie, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_DURATION_MS / 1000,
-    path: '/',
-  });
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE, sessionCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: SESSION_DURATION_MS / 1000,
+      path: '/',
+    });
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error('[session] createSessionCookie failed:', e);
+    return NextResponse.json({ error: 'Session creation failed' }, { status: 500 });
+  }
 }
 
 export async function DELETE() {

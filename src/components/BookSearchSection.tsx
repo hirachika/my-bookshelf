@@ -58,12 +58,12 @@ export default function BookSearchSection({ existingIds }: Props) {
       setPage(pageIndex);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
-      if (msg.includes("blocked") || msg.includes("PERMISSION_DENIED")) {
-        setError("Books APIが有効化されていません。Google Cloud ConsoleでBooks APIを有効にしてください。");
-      } else if (msg.includes("Quota") || msg.includes("quota")) {
+      if (msg.includes("blocked") || msg.includes("PERMISSION_DENIED") || msg.includes("API key")) {
+        setError("Google Books APIキーが無効または未設定です。Google Cloud ConsoleでAPIキーを確認してください。");
+      } else if (msg.includes("Quota") || msg.includes("quota") || msg.includes("rateLimitExceeded") || msg.includes("RATE_LIMIT")) {
         setError("APIのクォータ制限に達しました。しばらく待ってから再試行してください。");
       } else {
-        setError("検索に失敗しました。もう一度お試しください。");
+        setError(`検索に失敗しました: ${msg || "不明なエラー"}`);
       }
       setResults([]);
     } finally {
