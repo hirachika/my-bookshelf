@@ -77,8 +77,51 @@ npm run dev
 
 ## ビルド & デプロイ
 
+### 1. ローカルで変更をコミット・プッシュ
+
 ```bash
-npm run build   # standalone ビルド
+git add .
+git commit -m "コミットメッセージ"
+git push origin main
 ```
 
-Cloud Run へのデプロイは Dockerfile を使用しています。
+### 2. Cloud Shell でリポジトリを最新化
+
+[Google Cloud Shell](https://shell.cloud.google.com) を開き、以下を実行：
+
+```bash
+cd my-bookshelf
+git pull origin main
+```
+
+### 3. Cloud Run へデプロイ
+
+```bash
+bash deploy.sh
+```
+
+`deploy.sh` の内容（`FIREBASE_ADMIN_PRIVATE_KEY` は Cloud Run コンソールで別途設定）：
+
+```bash
+gcloud run deploy my-bookshelf \
+  --project my-bookshelf-2f81d \
+  --source . \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --set-env-vars GOOGLE_BOOKS_API_KEY=...,FIREBASE_ADMIN_PROJECT_ID=...,FIREBASE_ADMIN_CLIENT_EMAIL=...
+```
+
+### 4. デプロイ後のURL確認
+
+```bash
+gcloud run services describe my-bookshelf \
+  --project my-bookshelf-2f81d \
+  --region asia-northeast1 \
+  --format="value(status.url)"
+```
+
+### 注意: FIREBASE_ADMIN_PRIVATE_KEY の設定
+
+秘密鍵は改行を含むため `deploy.sh` には記載できません。  
+[Cloud Run コンソール](https://console.cloud.google.com/run) → サービス編集 → 「変数とシークレット」から手動で設定してください。
