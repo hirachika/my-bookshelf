@@ -14,11 +14,11 @@ export default function Dashboard({ books }: { books: Book[] }) {
   const existingIds = new Set(books.map((b) => b.id));
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box bg="gray.50">
       <Tabs.Root defaultValue="shelf" variant="line" colorPalette="orange">
         {/* 固定ヘッダー */}
         <Box as="header" position="fixed" top="0" left="0" right="0" zIndex="10" bg="orange.500">
-          <Box maxW="2xl" mx="auto" p="2" h="48px" display="flex" alignItems="center" justifyContent="space-between">
+          <Box maxW="xl" mx="auto" p="2" h="48px" display="flex" alignItems="center" justifyContent="space-between">
             <Heading as="h1" size="md" color="white">
               My Bookshelf
             </Heading>
@@ -37,7 +37,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
           borderBottomWidth="1px"
           borderColor="gray.100"
         >
-          <Box maxW="2xl" mx="auto">
+          <Box maxW="xl" mx="auto">
             <Tabs.List bg="transparent" gap="0">
               <Tabs.Trigger
                 value="shelf"
@@ -73,11 +73,12 @@ export default function Dashboard({ books }: { books: Book[] }) {
         {/* メインコンテンツ（固定ヘッダー分の余白を追加） */}
         <Box
           as="main"
-          maxW="2xl"
+          maxW="xl"
           mx="auto"
-          px="2"
-          pt="96px"
-          minH="100vh"
+          px="1rem"
+          pt="6.5rem"
+          pb="10rem"
+          minH="100svh"
           bg="white"
           style={{
             backgroundImage: "url('/bg-book.png')",
@@ -94,14 +95,14 @@ export default function Dashboard({ books }: { books: Book[] }) {
           <Tabs.Content value="search">
             <Stack gap="6">
               <Box as="section">
-                <Heading as="h2" size="md" mb="3">
+                <Heading as="h2" size="md" mb="2">
                   キーワードで検索
                 </Heading>
                 <BookSearchSection existingIds={existingIds} />
               </Box>
               <Separator />
               <Box as="section">
-                <Heading as="h2" size="md" mb="3">
+                <Heading as="h2" size="md" mb="2">
                   ISBNで検索
                 </Heading>
                 <ISBNSearchSection existingIds={existingIds} />

@@ -60,7 +60,12 @@ export default function BookSearchSection({ existingIds }: Props) {
       const msg = e instanceof Error ? e.message : "";
       if (msg.includes("blocked") || msg.includes("PERMISSION_DENIED") || msg.includes("API key")) {
         setError("Google Books APIキーが無効または未設定です。Google Cloud ConsoleでAPIキーを確認してください。");
-      } else if (msg.includes("Quota") || msg.includes("quota") || msg.includes("rateLimitExceeded") || msg.includes("RATE_LIMIT")) {
+      } else if (
+        msg.includes("Quota") ||
+        msg.includes("quota") ||
+        msg.includes("rateLimitExceeded") ||
+        msg.includes("RATE_LIMIT")
+      ) {
         setError("APIのクォータ制限に達しました。しばらく待ってから再試行してください。");
       } else {
         setError(`検索に失敗しました: ${msg || "不明なエラー"}`);
@@ -159,7 +164,7 @@ export default function BookSearchSection({ existingIds }: Props) {
             </Text>
           </Flex>
 
-          <SimpleGrid columns={1} gap="2" mb="6">
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap="2" mb="6">
             {results.map((book) => (
               <BookCard
                 key={book.id}

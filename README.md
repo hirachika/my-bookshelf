@@ -10,6 +10,36 @@
 - **星評価 / 読了日** — 読み終えた本に5段階評価と読了日を記録
 - **読書グラフ** — 月ごとの読了冊数をグラフで可視化
 
+## Firebase の用途
+
+このアプリでは Firebase をホスティングには使用していません。以下の2サービスのみ利用しています。
+
+| サービス | 用途 |
+|----------|------|
+| **Firebase Authentication** | Google アカウントによるログイン・セッション管理 |
+| **Cloud Firestore** | 本棚データの保存・取得 |
+
+### Firestore のデータ構造
+
+```
+users/
+  {uid}/
+    books/
+      {bookId}   ← Book ドキュメント（title, author, status, rating, finishedAt …）
+```
+
+### 認証フロー
+
+1. クライアント: `signInWithPopup` で Google 認証 → Firebase ID トークン取得
+2. サーバー (`/api/auth/session`): ID トークンを Firebase Admin SDK で検証 → セッションクッキー (`__session`) を発行
+3. ミドルウェア: リクエストごとにクッキーを検証してアクセス制御
+
+### デプロイ先
+
+アプリ本体は **Google Cloud Run** で動作しています。Firebase はバックエンドサービス（認証・DB）としてのみ利用しており、Firebase Hosting は使用していません。
+
+---
+
 ## 技術スタック
 
 | 項目 | 使用技術 |
