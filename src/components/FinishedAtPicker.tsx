@@ -11,7 +11,7 @@ interface Props {
   width?: string;
 }
 
-export default function FinishedAtPicker({ value, onChange, disabled = false, width = "140px" }: Props) {
+export default function FinishedAtPicker({ value, onChange, disabled = false, width = "100%" }: Props) {
   const parsed: DateValue[] = value ? [parseDate(value.slice(0, 10))] : [];
 
   const handleChange = (details: { value: DateValue[] }) => {

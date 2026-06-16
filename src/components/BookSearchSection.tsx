@@ -97,7 +97,7 @@ export default function BookSearchSection({ existingIds }: Props) {
 
   return (
     <Box>
-      <Grid templateColumns="1fr 1fr 4rem" gap="4">
+      <Grid templateColumns="6rem 1fr 4rem" gap="4">
         <NativeSelect.Root>
           <NativeSelect.Field
             value={searchType}

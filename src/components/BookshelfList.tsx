@@ -175,13 +175,12 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                       />
                     </Flex>
 
-                    <Flex gap="1" flexShrink={0} align="flex-end">
+                    <Flex gap="1" flex="1" align="flex-end">
                       {statusSelect(book, "72px", "xs")}
                       <FinishedAtPicker
                         value={book.finishedAt}
                         onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
                         disabled={book.status !== "read"}
-                        width="90px"
                       />
                     </Flex>
                   </Flex>
