@@ -75,7 +75,7 @@ export default function Dashboard({ books }: { books: Book[] }) {
           as="main"
           maxW="xl"
           mx="auto"
-          px="1rem"
+          px="0.75rem"
           pt="6.5rem"
           pb="10rem"
           minH="100svh"
