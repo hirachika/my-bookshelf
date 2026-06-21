@@ -77,8 +77,110 @@ npm run dev
 
 ## ビルド & デプロイ
 
+### 1. ローカルで変更をコミット・プッシュ
+
 ```bash
-npm run build   # standalone ビルド
+git add .
+git commit -m "コミットメッセージ"
+git push origin main
 ```
 
-Cloud Run へのデプロイは Dockerfile を使用しています。
+### 2. Cloud Shell でリポジトリを最新化
+
+[Google Cloud Shell](https://shell.cloud.google.com) を開き、以下を実行：
+
+```bash
+cd my-bookshelf
+git pull origin main
+```
+
+### 3. Cloud Run へデプロイ
+
+```bash
+bash deploy.sh
+```
+
+`deploy.sh` の内容（`FIREBASE_ADMIN_PRIVATE_KEY` は Cloud Run コンソールで別途設定）：
+
+```bash
+gcloud run deploy my-bookshelf \
+  --project my-bookshelf-2f81d \
+  --source . \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --set-env-vars GOOGLE_BOOKS_API_KEY=...,FIREBASE_ADMIN_PROJECT_ID=...,FIREBASE_ADMIN_CLIENT_EMAIL=...
+```
+
+### 4. デプロイ後のURL確認
+
+```bash
+gcloud run services describe my-bookshelf \
+  --project my-bookshelf-2f81d \
+  --region asia-northeast1 \
+  --format="value(status.url)"
+```
+
+### 注意: FIREBASE_ADMIN_PRIVATE_KEY の設定
+
+秘密鍵は **Google Cloud Secret Manager** で管理しています。`deploy.sh` の `--set-secrets` フラグで自動的に参照されるため、デプロイのたびに手動設定する必要はありません。
+
+初回セットアップ時のみ以下を実行してください（Cloud Shell）：
+
+```bash
+# 秘密鍵をSecret Managerに登録
+echo -n "-----BEGIN PRIVATE KEY-----\n..." | gcloud secrets create firebase-admin-private-key \
+  --project my-bookshelf-2f81d \
+  --data-file=-
+
+# Cloud RunのサービスアカウントにSecret閲覧権限を付与
+gcloud secrets add-iam-policy-binding firebase-admin-private-key \
+  --project my-bookshelf-2f81d \
+  --member="serviceAccount:firebase-adminsdk-fbsvc@my-bookshelf-2f81d.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+---
+
+## トラブルシューティング: 「このサイトにアクセスできません」
+
+デプロイ成功後にブラウザで「このサイトにアクセスできません」と表示される場合、以下の手順で原因を特定してください。
+
+### 手順1: 正しいURLにアクセスしているか確認
+
+Firebase Hosting と Cloud Run は別サービスです。正しい Cloud Run の URL を確認します：
+
+```bash
+gcloud run services describe my-bookshelf \
+  --project my-bookshelf-2f81d \
+  --region asia-northeast1 \
+  --format="value(status.url)"
+```
+
+表示された URL（`https://my-bookshelf-....run.app` 形式）にアクセスしてください。
+
+### 手順2: Cloud Run のログでエラーを確認
+
+```bash
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=my-bookshelf" \
+  --project my-bookshelf-2f81d \
+  --limit 50 \
+  --format "value(textPayload)"
+```
+
+または [Cloud Run コンソール](https://console.cloud.google.com/run) → サービス選択 → 「ログ」タブで確認できます。
+
+### 手順3: よくある原因と対処法
+
+| 症状 | 原因 | 対処 |
+|------|------|------|
+| ログに `FIREBASE_ADMIN_PRIVATE_KEY` 関連エラー | 秘密鍵が未設定でアプリが起動クラッシュ | Cloud Run コンソール →「変数とシークレット」で `FIREBASE_ADMIN_PRIVATE_KEY` を設定して再デプロイ |
+| ログに `Cannot find module` などのエラー | ビルド失敗 | Cloud Shell で `bash deploy.sh` を再実行し、エラー出力を確認 |
+| ログにエラーなし・コンテナが起動していない | デプロイがまだ完了していない | 数分待ってから再アクセス |
+| ログに `Port 8080` 関連エラー | ポート設定の問題 | `deploy.sh` に `--port 8080` が含まれているか確認 |
+
+### FIREBASE_ADMIN_PRIVATE_KEY が消える場合
+
+`--set-env-vars` で環境変数を指定すると、**デプロイのたびに全ての環境変数が上書き**されます。手動でCloud Runコンソールに設定しても次のデプロイで消えてしまいます。
+
+対処法: `deploy.sh` の `--set-secrets` フラグでSecret Managerを参照する方式に切り替えてください（上記「注意」セクション参照）。
