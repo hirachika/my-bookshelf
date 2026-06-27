@@ -138,8 +138,8 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                 <Image
                   src={thumbSrc(book)}
                   alt={book.title}
-                  w="84px"
-                  minH="126px"
+                  w="64px"
+                  minH="96px"
                   fit="cover"
                   flexShrink={0}
                   onError={(e) => {
@@ -167,13 +167,15 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                     />
                   </Flex>
                   <Box>
-                    <Flex gap="2">
+                    <Flex gap="2" minW="0">
                       {statusSelect(book, "xs")}
-                      <FinishedAtPicker
-                        value={book.finishedAt}
-                        onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
-                        disabled={book.status !== "read"}
-                      />
+                      <Box flex="1" minW="0">
+                        <FinishedAtPicker
+                          value={book.finishedAt}
+                          onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
+                          disabled={book.status !== "read"}
+                        />
+                      </Box>
                     </Flex>
                   </Box>
                 </Box>
