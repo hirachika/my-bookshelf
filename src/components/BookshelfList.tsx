@@ -64,7 +64,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
   const thumbSrc = (book: Book) => (book.thumbnail ? book.thumbnail.replace("http://", "https://") : "/no-image.jpg");
 
   const statusSelect = (book: Book, fontSize: "sm" | "xs" = "sm") => (
-    <NativeSelect.Root disabled={isPending}>
+    <NativeSelect.Root disabled={isPending} width="5rem">
       <NativeSelect.Field
         value={book.status}
         onChange={(e) => handleStatusChange(book.id, e.target.value as BookStatus)}
@@ -133,41 +133,39 @@ export default function BookshelfList({ books }: { books: Book[] }) {
         {filtered.length === 0
           ? empty
           : filtered.map((book) => (
-              <Flex key={book.id} align="center" p="2" justifyContent="space-between" bg="white" rounded="8px">
+              <Flex key={book.id} align="center" p="3" justifyContent="space-between" bg="white" gap="2" rounded="8px">
                 {/* Image */}
-                <Box w="17%">
-                  <Image
-                    src={thumbSrc(book)}
-                    alt={book.title}
-                    fit="cover"
-                    flexShrink={0}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
-                    }}
-                  />
-                </Box>
+                <Image
+                  src={thumbSrc(book)}
+                  alt={book.title}
+                  w="84px"
+                  minH="126px"
+                  fit="cover"
+                  flexShrink={0}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
+                  }}
+                />
 
-                <Box w="80%">
+                <Box flex="1" minW="0" pl="2">
                   <Text fontSize="sm" fontWeight="bold" color="gray.800">
                     {book.title}
                   </Text>
                   <Text fontSize="xs" color="gray.500">
                     {book.author}
                   </Text>
-                  <Box>
-                    <Flex gap="1">
-                      {book.categories[0] && (
-                        <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0}>
-                          {book.categories[0]}
-                        </Badge>
-                      )}
-                      <StarRating
-                        value={book.rating ?? null}
-                        onChange={(r) => handleRatingChange(book.id, r)}
-                        disabled={book.status !== "read"}
-                      />
-                    </Flex>
-                  </Box>
+                  <Flex gap="1" my="1">
+                    {book.categories[0] && (
+                      <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0} px="1">
+                        {book.categories[0]}
+                      </Badge>
+                    )}
+                    <StarRating
+                      value={book.rating ?? null}
+                      onChange={(r) => handleRatingChange(book.id, r)}
+                      disabled={book.status !== "read"}
+                    />
+                  </Flex>
                   <Box>
                     <Flex gap="2">
                       {statusSelect(book, "xs")}
