@@ -170,7 +170,7 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
                   <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number, name: string) => [`${value}冊`, name]} />
+              <Tooltip formatter={(value, name) => [`${value}冊`, name]} />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
             </PieChart>
           </ResponsiveContainer>
