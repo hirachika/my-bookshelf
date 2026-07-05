@@ -162,7 +162,7 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
                 cx="50%"
                 cy="50%"
                 outerRadius={70}
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                label={({ percent }: { percent?: number }) => percent ? `${(percent * 100).toFixed(0)}%` : ""}
                 labelLine={false}
                 fontSize={10}
               >
