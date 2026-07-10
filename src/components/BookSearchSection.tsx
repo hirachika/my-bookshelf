@@ -145,6 +145,7 @@ export default function BookSearchSection({ existingIds }: Props) {
           colorPalette="orange"
           size="sm"
           width="full"
+          _disabled={{ bg: "orange.300", color: "white", opacity: 1, cursor: "not-allowed" }}
         >
           検索
         </Button>
