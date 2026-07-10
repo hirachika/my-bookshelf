@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, Flex, Grid, Input, NativeSelect, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, Input, SimpleGrid, Text } from "@chakra-ui/react";
 import type { GoogleBookItem } from "@/types/book";
 import BookCard from "./BookCard";
 
@@ -23,18 +23,10 @@ function getPageNumbers(current: number, total: number): (number | "...")[] {
   return pages;
 }
 
-type SearchType = "" | "intitle" | "inauthor" | "inpublisher";
-
-const SEARCH_TYPES: { value: SearchType; label: string }[] = [
-  { value: "", label: "全て" },
-  { value: "intitle", label: "タイトル" },
-  { value: "inauthor", label: "著者" },
-  { value: "inpublisher", label: "出版社" },
-];
-
 export default function BookSearchSection({ existingIds }: Props) {
-  const [query, setQuery] = useState("");
-  const [searchType, setSearchType] = useState<SearchType>("");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [publisher, setPublisher] = useState("");
   const [results, setResults] = useState<GoogleBookItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -44,6 +36,15 @@ export default function BookSearchSection({ existingIds }: Props) {
   const [totalItems, setTotalItems] = useState(0);
 
   const totalPages = Math.ceil(Math.min(totalItems, 1000) / PER_PAGE);
+  const hasInput = title.trim() || author.trim() || publisher.trim();
+
+  const buildQuery = () => {
+    const parts: string[] = [];
+    if (title.trim()) parts.push(`intitle:${title.trim()}`);
+    if (author.trim()) parts.push(`inauthor:${author.trim()}`);
+    if (publisher.trim()) parts.push(`inpublisher:${publisher.trim()}`);
+    return parts.join("+");
+  };
 
   const fetchPage = async (q: string, pageIndex: number) => {
     setLoading(true);
@@ -76,18 +77,16 @@ export default function BookSearchSection({ existingIds }: Props) {
     }
   };
 
-  const buildQuery = (q: string) => (searchType ? `${searchType}:${q.trim()}` : q.trim());
-
   const search = () => {
-    if (!query.trim()) return;
+    if (!hasInput) return;
     setSearched(true);
     setPage(0);
     setTotalItems(0);
-    fetchPage(buildQuery(query), 0);
+    fetchPage(buildQuery(), 0);
   };
 
   const goToPage = (pageIndex: number) => {
-    fetchPage(buildQuery(query), pageIndex);
+    fetchPage(buildQuery(), pageIndex);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -95,56 +94,57 @@ export default function BookSearchSection({ existingIds }: Props) {
     setLocalAdded((prev) => new Set([...prev, id]));
   };
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") search();
+  };
+
   return (
     <Box>
-      <Grid templateColumns="6rem 1fr 4rem" gap="4">
-        <NativeSelect.Root>
-          <NativeSelect.Field
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value as SearchType)}
-            px="2"
-            py="2"
-            fontSize="sm"
-            color="gray.700"
-            bg="white"
-          >
-            {SEARCH_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </NativeSelect.Field>
-          <NativeSelect.Indicator />
-        </NativeSelect.Root>
+      <Grid gap="2" mb="2">
         <Input
           type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && search()}
-          placeholder={
-            searchType === "intitle"
-              ? "タイトルで検索..."
-              : searchType === "inauthor"
-                ? "著者名で検索..."
-                : searchType === "inpublisher"
-                  ? "出版社名で検索..."
-                  : "タイトル、著者名などで検索..."
-          }
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="タイトル"
           px="2"
           py="2"
           fontSize="sm"
           color="gray.700"
           bg="white"
-          flex="1"
+        />
+        <Input
+          type="text"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="著者名"
+          px="2"
+          py="2"
+          fontSize="sm"
+          color="gray.700"
+          bg="white"
+        />
+        <Input
+          type="text"
+          value={publisher}
+          onChange={(e) => setPublisher(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="出版社"
+          px="2"
+          py="2"
+          fontSize="sm"
+          color="gray.700"
+          bg="white"
         />
         <Button
           onClick={search}
-          disabled={loading || !query.trim()}
+          disabled={loading || !hasInput}
           loading={loading}
           loadingText="検索中..."
           colorPalette="orange"
           size="sm"
-          className="shrink-0"
+          width="full"
         >
           検索
         </Button>
