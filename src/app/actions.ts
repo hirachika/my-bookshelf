@@ -135,6 +135,12 @@ export async function updateRating(id: string, rating: number | null): Promise<v
   revalidatePath("/");
 }
 
+export async function updateComment(id: string, comment: string | null): Promise<void> {
+  const uid = await getCurrentUserId();
+  await updateBook(uid, id, { comment });
+  revalidatePath("/");
+}
+
 export async function deleteFromShelf(id: string): Promise<void> {
   const uid = await getCurrentUserId();
   await deleteBook(uid, id);

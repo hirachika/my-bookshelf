@@ -1,9 +1,28 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Badge, Box, Button, Flex, IconButton, Image, NativeSelect, Text } from "@chakra-ui/react";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { changeStatus, deleteFromShelf, updateFinishedAt, updateRating } from "@/app/actions";
+import {
+  Badge,
+  Box,
+  Button,
+  DialogBackdrop,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogPositioner,
+  DialogRoot,
+  DialogTitle,
+  Flex,
+  IconButton,
+  Image,
+  NativeSelect,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
+import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
+import { changeStatus, deleteFromShelf, updateComment, updateFinishedAt, updateRating } from "@/app/actions";
 import dynamic from "next/dynamic";
 import StarRating from "./StarRating";
 import type { Book, BookStatus } from "@/types/book";
@@ -18,9 +37,169 @@ const FILTERS: Array<{ value: BookStatus | "all"; label: string }> = [
   { value: "dropped", label: "挫折" },
 ];
 
+const STATUS_LABELS: Record<BookStatus, string> = {
+  want: "読みたい",
+  reading: "読書中",
+  read: "読了",
+  dropped: "挫折",
+};
+
+const STATUS_COLORS: Record<BookStatus, string> = {
+  want: "gray",
+  reading: "blue",
+  read: "green",
+  dropped: "red",
+};
+
+function formatDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+}
+
+interface EditDialogProps {
+  book: Book;
+  open: boolean;
+  onClose: () => void;
+}
+
+function EditDialog({ book, open, onClose }: EditDialogProps) {
+  const [isPending, startTransition] = useTransition();
+  const [status, setStatus] = useState<BookStatus>(book.status);
+  const [finishedAt, setFinishedAt] = useState<string | null>(book.finishedAt);
+  const [rating, setRating] = useState<number | null>(book.rating ?? null);
+  const [comment, setComment] = useState<string>(book.comment ?? "");
+
+  const handleSave = () => {
+    startTransition(async () => {
+      const promises: Promise<void>[] = [];
+      if (status !== book.status) promises.push(changeStatus(book.id, status));
+      if (finishedAt !== book.finishedAt)
+        promises.push(updateFinishedAt(book.id, finishedAt ?? ""));
+      if (rating !== (book.rating ?? null)) promises.push(updateRating(book.id, rating));
+      const trimmed = comment.trim() || null;
+      if (trimmed !== (book.comment ?? null)) promises.push(updateComment(book.id, trimmed));
+      await Promise.all(promises);
+      onClose();
+    });
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm(`「${book.title}」を本棚から削除しますか？`)) return;
+    startTransition(async () => {
+      await deleteFromShelf(book.id);
+      onClose();
+    });
+  };
+
+  return (
+    <DialogRoot open={open} onOpenChange={({ open }) => !open && onClose()} placement="center">
+      <DialogBackdrop />
+      <DialogPositioner>
+        <DialogContent maxW="sm" mx="4">
+          <DialogHeader>
+            <DialogTitle fontSize="sm" fontWeight="bold" color="gray.800" lineClamp={2} pr="6">
+              {book.title}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogCloseTrigger />
+          <DialogBody display="flex" flexDirection="column" gap="4">
+            {/* ステータス */}
+            <Box>
+              <Text fontSize="xs" color="gray.500" mb="1">ステータス</Text>
+              <NativeSelect.Root width="full">
+                <NativeSelect.Field
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as BookStatus)}
+                  fontSize="sm"
+                  color="gray.700"
+                  bg="white"
+                >
+                  <option value="want">読みたい</option>
+                  <option value="reading">読書中</option>
+                  <option value="read">読了</option>
+                  <option value="dropped">挫折</option>
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+            </Box>
+
+            {/* 読了日 */}
+            <Box>
+              <Text fontSize="xs" color="gray.500" mb="1">読了日</Text>
+              <FinishedAtPicker
+                value={finishedAt}
+                onChange={(v) => setFinishedAt(v)}
+                disabled={status !== "read"}
+              />
+            </Box>
+
+            {/* 星評価 */}
+            <Box>
+              <Text fontSize="xs" color="gray.500" mb="1">評価</Text>
+              <StarRating
+                value={rating}
+                onChange={(r) => setRating(r === 0 ? null : r)}
+                disabled={status !== "read"}
+                size="md"
+              />
+            </Box>
+
+            {/* 一言コメント */}
+            <Box>
+              <Flex justify="space-between" mb="1">
+                <Text fontSize="xs" color="gray.500">一言コメント</Text>
+                <Text fontSize="xs" color={comment.length > 25 ? "red.500" : "gray.400"}>
+                  {comment.length}/25
+                </Text>
+              </Flex>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value.slice(0, 25))}
+                placeholder="25文字以内で一言..."
+                fontSize="sm"
+                rows={2}
+                resize="none"
+                bg="white"
+              />
+            </Box>
+          </DialogBody>
+
+          <DialogFooter gap="2" flexWrap="wrap">
+            <IconButton
+              onClick={handleDelete}
+              disabled={isPending}
+              aria-label="削除"
+              variant="ghost"
+              color="red.400"
+              _hover={{ bg: "red.50" }}
+              mr="auto"
+            >
+              <RiDeleteBin6Line />
+            </IconButton>
+            <Button variant="ghost" colorPalette="gray" onClick={onClose} disabled={isPending} size="sm">
+              キャンセル
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={isPending || comment.length > 25}
+              loading={isPending}
+              loadingText="保存中..."
+              colorPalette="orange"
+              size="sm"
+            >
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPositioner>
+    </DialogRoot>
+  );
+}
+
 export default function BookshelfList({ books }: { books: Book[] }) {
   const [filter, setFilter] = useState<BookStatus | "all">("all");
-  const [isPending, startTransition] = useTransition();
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
 
   const filtered = (filter === "all" ? books : books.filter((b) => b.status === filter)).slice().sort((a, b) => {
     const ta = a.finishedAt ? new Date(a.finishedAt).getTime() : 0;
@@ -36,75 +215,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
     dropped: books.filter((b) => b.status === "dropped").length,
   };
 
-  const handleStatusChange = (id: string, status: BookStatus) => {
-    startTransition(async () => {
-      await changeStatus(id, status);
-    });
-  };
-
-  const handleFinishedAtChange = (id: string, value: string) => {
-    startTransition(async () => {
-      await updateFinishedAt(id, value ? new Date(value + "T00:00:00Z").toISOString() : null);
-    });
-  };
-
-  const handleRatingChange = (id: string, rating: number) => {
-    startTransition(async () => {
-      await updateRating(id, rating === 0 ? null : rating);
-    });
-  };
-
-  const handleDelete = (id: string, title: string) => {
-    if (!window.confirm(`「${title}」を本棚から削除しますか？`)) return;
-    startTransition(async () => {
-      await deleteFromShelf(id);
-    });
-  };
-
   const thumbSrc = (book: Book) => (book.thumbnail ? book.thumbnail.replace("http://", "https://") : "/no-image.jpg");
-
-  const statusSelect = (book: Book, fontSize: "sm" | "xs" = "sm") => (
-    <NativeSelect.Root disabled={isPending} width="5rem">
-      <NativeSelect.Field
-        value={book.status}
-        onChange={(e) => handleStatusChange(book.id, e.target.value as BookStatus)}
-        px="2"
-        py="1.5"
-        fontSize={fontSize}
-        color="gray.700"
-        bg="white"
-        width="5rem"
-      >
-        <option value="want">読みたい</option>
-        <option value="reading">読書中</option>
-        <option value="read">読了</option>
-        <option value="dropped">挫折</option>
-      </NativeSelect.Field>
-      <NativeSelect.Indicator />
-    </NativeSelect.Root>
-  );
-
-  const deleteBtn = (book: Book) => (
-    <IconButton
-      onClick={() => handleDelete(book.id, book.title)}
-      disabled={isPending}
-      aria-label="削除"
-      variant="ghost"
-      size="xs"
-      color="gray.300"
-      _hover={{ color: "red.400" }}
-    >
-      <RiDeleteBin6Line />
-    </IconButton>
-  );
-
-  const empty = (
-    <Box py="12" textAlign="center">
-      <Text color="gray.300" fontSize="sm">
-        まだ本がありません
-      </Text>
-    </Box>
-  );
 
   return (
     <Box>
@@ -130,58 +241,99 @@ export default function BookshelfList({ books }: { books: Book[] }) {
       </Flex>
 
       <Flex direction="column" gap="2">
-        {filtered.length === 0
-          ? empty
-          : filtered.map((book) => (
-              <Flex key={book.id} align="center" p="3" justifyContent="space-between" bg="white" gap="2" rounded="8px">
-                {/* Image */}
+        {filtered.length === 0 ? (
+          <Box py="12" textAlign="center">
+            <Text color="gray.300" fontSize="sm">まだ本がありません</Text>
+          </Box>
+        ) : (
+          filtered.map((book) => (
+            <Flex key={book.id} p="3" bg="white" rounded="8px" gap="3" align="flex-start">
+              {/* サムネイル */}
+              {book.thumbnail ? (
                 <Image
                   src={thumbSrc(book)}
                   alt={book.title}
-                  w="64px"
-                  minH="96px"
+                  w="56px"
+                  minH="84px"
                   fit="cover"
                   flexShrink={0}
+                  rounded="sm"
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src = "/no-image.jpg";
                   }}
                 />
+              ) : (
+                <Flex
+                  w="56px"
+                  minH="84px"
+                  flexShrink={0}
+                  rounded="sm"
+                  bg="gray.100"
+                  align="center"
+                  justify="center"
+                  fontSize="xl"
+                  color="gray.300"
+                >
+                  📚
+                </Flex>
+              )}
 
-                <Box flex="1" minW="0" pl="2">
-                  <Text fontSize="sm" fontWeight="bold" color="gray.800">
-                    {book.title}
+              {/* コンテンツ */}
+              <Box flex="1" minW="0">
+                <Text fontSize="sm" fontWeight="bold" color="gray.800" lineClamp={2}>
+                  {book.title}
+                </Text>
+                <Text fontSize="xs" color="gray.500" truncate>{book.author}</Text>
+
+                <Flex gap="1" mt="1" flexWrap="wrap" align="center">
+                  {book.categories[0] && (
+                    <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0} px="1">
+                      {book.categories[0]}
+                    </Badge>
+                  )}
+                  <Badge colorPalette={STATUS_COLORS[book.status]} variant="subtle" size="sm" px="1">
+                    {STATUS_LABELS[book.status]}
+                  </Badge>
+                </Flex>
+
+                <Flex align="center" gap="2" mt="1">
+                  <StarRating value={book.rating ?? null} disabled size="sm" />
+                  {book.finishedAt && (
+                    <Text fontSize="xs" color="gray.400">{formatDate(book.finishedAt)}</Text>
+                  )}
+                </Flex>
+
+                {book.comment && (
+                  <Text fontSize="xs" color="gray.500" mt="1" lineClamp={1}>
+                    {book.comment}
                   </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    {book.author}
-                  </Text>
-                  <Flex gap="1" my="1">
-                    {book.categories[0] && (
-                      <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0} px="1">
-                        {book.categories[0]}
-                      </Badge>
-                    )}
-                    <StarRating
-                      value={book.rating ?? null}
-                      onChange={(r) => handleRatingChange(book.id, r)}
-                      disabled={book.status !== "read"}
-                    />
-                  </Flex>
-                  <Box>
-                    <Flex gap="2" minW="0">
-                      {statusSelect(book, "xs")}
-                      <Box flex="1" minW="0">
-                        <FinishedAtPicker
-                          value={book.finishedAt}
-                          onChange={(v) => handleFinishedAtChange(book.id, v ? v : "")}
-                          disabled={book.status !== "read"}
-                        />
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Box>
-              </Flex>
-            ))}
+                )}
+              </Box>
+
+              {/* 編集ボタン */}
+              <IconButton
+                onClick={() => setEditingBook(book)}
+                aria-label="編集"
+                variant="ghost"
+                size="xs"
+                color="gray.400"
+                _hover={{ color: "orange.400" }}
+                flexShrink={0}
+              >
+                <RiEditLine />
+              </IconButton>
+            </Flex>
+          ))
+        )}
       </Flex>
+
+      {editingBook && (
+        <EditDialog
+          book={editingBook}
+          open={!!editingBook}
+          onClose={() => setEditingBook(null)}
+        />
+      )}
     </Box>
   );
 }

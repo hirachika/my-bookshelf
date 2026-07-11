@@ -13,6 +13,7 @@ export interface Book {
   finishedAt: string | null;
   addedAt: string;
   rating: number | null;
+  comment?: string | null;
 }
 
 export interface GoogleBookItem {
