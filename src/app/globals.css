@@ -42,10 +42,11 @@ a {
   text-decoration: none;
 }
 
+.recharts-wrapper,
+.recharts-wrapper *,
 .recharts-wrapper svg,
-.recharts-wrapper:focus,
-.recharts-wrapper svg:focus {
-  outline: none;
+.recharts-wrapper svg * {
+  outline: none !important;
 }
 
 @media (prefers-color-scheme: dark) {
