@@ -280,26 +280,23 @@ export default function BookshelfList({ books }: { books: Book[] }) {
 
               {/* コンテンツ */}
               <Box flex="1" minW="0">
-                <Text fontSize="sm" fontWeight="bold" color="gray.800" lineClamp={2}>
+                <Text fontSize="md" fontWeight="bold" color="gray.800" lineClamp={2}>
                   {book.title}
                 </Text>
                 <Text fontSize="xs" color="gray.500" truncate>{book.author}</Text>
 
-                <Flex gap="1" mt="1" flexWrap="wrap" align="center">
+                <Flex gap="1" mt="1" align="center" flexWrap="nowrap" overflow="hidden">
                   {book.categories[0] && (
                     <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0} px="1">
                       {book.categories[0]}
                     </Badge>
                   )}
-                  <Badge colorPalette={STATUS_COLORS[book.status]} variant="subtle" size="sm" px="1">
+                  <Badge colorPalette={STATUS_COLORS[book.status]} variant="subtle" size="sm" px="1" flexShrink={0}>
                     {STATUS_LABELS[book.status]}
                   </Badge>
-                </Flex>
-
-                <Flex align="center" gap="2" mt="1">
                   <StarRating value={book.rating ?? null} disabled size="sm" />
                   {book.finishedAt && (
-                    <Text fontSize="xs" color="gray.400">{formatDate(book.finishedAt)}</Text>
+                    <Text fontSize="xs" color="gray.600" flexShrink={0}>{formatDate(book.finishedAt)}</Text>
                   )}
                 </Flex>
 
@@ -308,20 +305,19 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                     {book.comment}
                   </Text>
                 )}
-              </Box>
 
-              {/* 編集ボタン */}
-              <IconButton
-                onClick={() => setEditingBook(book)}
-                aria-label="編集"
-                variant="ghost"
-                size="xs"
-                color="gray.400"
-                _hover={{ color: "orange.400" }}
-                flexShrink={0}
-              >
-                <RiEditLine />
-              </IconButton>
+                {/* 編集ボタン */}
+                <Button
+                  onClick={() => setEditingBook(book)}
+                  colorPalette="orange"
+                  variant="solid"
+                  size="xs"
+                  mt="2"
+                >
+                  <RiEditLine />
+                  編集する
+                </Button>
+              </Box>
             </Flex>
           ))
         )}
