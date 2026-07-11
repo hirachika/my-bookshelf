@@ -126,7 +126,7 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
           <Text>月平均：{avg.toFixed(1)}冊</Text>
         </Box>
 
-        <ResponsiveContainer width="100%" height={130}>
+        <ResponsiveContainer width="100%" height={130} style={{ outline: "none" }}>
           <BarChart data={data} margin={{ top: 16, right: 0, left: 0, bottom: 0 }} barCategoryGap="25%">
             <XAxis
               dataKey="month"
@@ -153,7 +153,7 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
             <Text>あなたが一番よく読むカテゴリ：{categoryData[0].name}</Text>
           </Box>
 
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={260} style={{ outline: "none" }}>
             <PieChart>
               <Pie
                 data={categoryData}

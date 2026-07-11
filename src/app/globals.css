@@ -42,6 +42,12 @@ a {
   text-decoration: none;
 }
 
+.recharts-wrapper svg,
+.recharts-wrapper:focus,
+.recharts-wrapper svg:focus {
+  outline: none;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
