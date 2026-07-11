@@ -302,9 +302,8 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                 <Text fontSize="md" fontWeight="bold" color="gray.800" lineClamp={2}>
                   {book.title}
                 </Text>
-                <Text fontSize="xs" color="gray.500" truncate>{book.author}</Text>
-
-                <Flex gap="1" mt="1" align="center" flexWrap="nowrap" overflow="hidden">
+                <Flex gap="1" align="center" flexWrap="nowrap" overflow="hidden">
+                  <Text fontSize="xs" color="gray.500" truncate flexShrink={1} minW="0">{book.author}</Text>
                   {book.categories[0] && (
                     <Badge colorPalette="orange" variant="subtle" size="sm" flexShrink={0} px="1">
                       {book.categories[0]}
@@ -313,6 +312,9 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                   <Badge colorPalette={STATUS_COLORS[book.status]} variant="subtle" size="sm" px="1" flexShrink={0}>
                     {STATUS_LABELS[book.status]}
                   </Badge>
+                </Flex>
+
+                <Flex gap="1" mt="1" align="center" flexWrap="nowrap" overflow="hidden">
                   <StarRating value={book.rating ?? null} disabled size="sm" />
                   {book.finishedAt && (
                     <Text fontSize="xs" color="gray.600" flexShrink={0}>{formatDate(book.finishedAt)}</Text>
