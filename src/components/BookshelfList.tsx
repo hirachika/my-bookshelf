@@ -94,7 +94,7 @@ function EditDialog({ book, open, onClose }: EditDialogProps) {
     <DialogRoot open={open} onOpenChange={({ open }) => !open && onClose()} placement="center">
       <DialogBackdrop />
       <DialogPositioner>
-        <DialogContent maxW="sm" mx="4">
+        <DialogContent maxW="sm" mx="4" py="6" px="4">
           <DialogHeader>
             <DialogTitle fontSize="sm" fontWeight="bold" color="gray.800" lineClamp={2} pr="6">
               {book.title}
