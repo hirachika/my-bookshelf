@@ -91,7 +91,7 @@ function EditDialog({ book, open, onClose }: EditDialogProps) {
   };
 
   return (
-    <DialogRoot open={open} onOpenChange={({ open }) => !open && onClose()} placement="center">
+    <DialogRoot open={open} onOpenChange={({ open: isOpen }) => { if (!isOpen) onClose(); }} placement="center">
       <DialogBackdrop />
       <DialogPositioner>
         <DialogContent maxW="sm" mx="4" py="6" px="4">
@@ -198,6 +198,16 @@ function EditDialog({ book, open, onClose }: EditDialogProps) {
 export default function BookshelfList({ books }: { books: Book[] }) {
   const [filter, setFilter] = useState<BookStatus | "all">("all");
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const openDialog = (book: Book) => {
+    setEditingBook(book);
+    setDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+  };
 
   const filtered = (filter === "all" ? books : books.filter((b) => b.status === filter)).slice().sort((a, b) => {
     const ta = a.finishedAt ? new Date(a.finishedAt).getTime() : 0;
@@ -252,7 +262,7 @@ export default function BookshelfList({ books }: { books: Book[] }) {
               rounded="8px"
               gap="3"
               align="flex-start"
-              onClick={() => setEditingBook(book)}
+              onClick={() => openDialog(book)}
               cursor="pointer"
               _hover={{ bg: "orange.50" }}
               transition="background 0.15s"
@@ -323,8 +333,8 @@ export default function BookshelfList({ books }: { books: Book[] }) {
       {editingBook && (
         <EditDialog
           book={editingBook}
-          open={!!editingBook}
-          onClose={() => setEditingBook(null)}
+          open={dialogOpen}
+          onClose={closeDialog}
         />
       )}
     </Box>
