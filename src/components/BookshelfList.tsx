@@ -21,7 +21,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { deleteFromShelf, saveBookEdits } from "@/app/actions";
 import dynamic from "next/dynamic";
 import StarRating from "./StarRating";
@@ -245,7 +245,18 @@ export default function BookshelfList({ books }: { books: Book[] }) {
           </Box>
         ) : (
           filtered.map((book) => (
-            <Flex key={book.id} p="3" bg="white" rounded="8px" gap="3" align="flex-start">
+            <Flex
+              key={book.id}
+              p="3"
+              bg="white"
+              rounded="8px"
+              gap="3"
+              align="flex-start"
+              onClick={() => setEditingBook(book)}
+              cursor="pointer"
+              _hover={{ bg: "orange.50" }}
+              transition="background 0.15s"
+            >
               {/* サムネイル */}
               {book.thumbnail ? (
                 <Image
@@ -303,18 +314,6 @@ export default function BookshelfList({ books }: { books: Book[] }) {
                     {book.comment}
                   </Text>
                 )}
-
-                {/* 編集ボタン */}
-                <Button
-                  onClick={() => setEditingBook(book)}
-                  colorPalette="orange"
-                  variant="solid"
-                  size="xs"
-                  mt="2"
-                >
-                  <RiEditLine />
-                  編集する
-                </Button>
               </Box>
             </Flex>
           ))
