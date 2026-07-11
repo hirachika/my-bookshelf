@@ -141,6 +141,30 @@ export async function updateComment(id: string, comment: string | null): Promise
   revalidatePath("/");
 }
 
+export async function saveBookEdits(
+  id: string,
+  edits: { status: BookStatus; finishedAt: string | null; rating: number | null; comment: string | null },
+): Promise<void> {
+  const uid = await getCurrentUserId();
+  const books = await getBooks(uid);
+  const book = books.find((b) => b.id === id);
+  if (!book) return;
+
+  const now = new Date().toISOString();
+  const updates: Partial<Book> = {
+    status: edits.status,
+    finishedAt: edits.finishedAt,
+    rating: edits.rating,
+    comment: edits.comment,
+  };
+
+  if (edits.status === "reading" && !book.startedAt) updates.startedAt = now;
+  if (edits.status === "read" && !book.startedAt) updates.startedAt = now;
+
+  await updateBook(uid, id, updates);
+  revalidatePath("/");
+}
+
 export async function deleteFromShelf(id: string): Promise<void> {
   const uid = await getCurrentUserId();
   await deleteBook(uid, id);

@@ -22,7 +22,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
-import { changeStatus, deleteFromShelf, updateComment, updateFinishedAt, updateRating } from "@/app/actions";
+import { deleteFromShelf, saveBookEdits } from "@/app/actions";
 import dynamic from "next/dynamic";
 import StarRating from "./StarRating";
 import type { Book, BookStatus } from "@/types/book";
@@ -71,24 +71,22 @@ function EditDialog({ book, open, onClose }: EditDialogProps) {
   const [comment, setComment] = useState<string>(book.comment ?? "");
 
   const handleSave = () => {
+    onClose();
     startTransition(async () => {
-      const promises: Promise<void>[] = [];
-      if (status !== book.status) promises.push(changeStatus(book.id, status));
-      if (finishedAt !== book.finishedAt)
-        promises.push(updateFinishedAt(book.id, finishedAt ?? ""));
-      if (rating !== (book.rating ?? null)) promises.push(updateRating(book.id, rating));
-      const trimmed = comment.trim() || null;
-      if (trimmed !== (book.comment ?? null)) promises.push(updateComment(book.id, trimmed));
-      await Promise.all(promises);
-      onClose();
+      await saveBookEdits(book.id, {
+        status,
+        finishedAt,
+        rating,
+        comment: comment.trim() || null,
+      });
     });
   };
 
   const handleDelete = () => {
     if (!window.confirm(`「${book.title}」を本棚から削除しますか？`)) return;
+    onClose();
     startTransition(async () => {
       await deleteFromShelf(book.id);
-      onClose();
     });
   };
 
