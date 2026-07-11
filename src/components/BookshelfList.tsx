@@ -175,7 +175,7 @@ function EditDialog({ book, open, onClose }: EditDialogProps) {
             >
               <RiDeleteBin6Line />
             </IconButton>
-            <Button variant="ghost" colorPalette="gray" onClick={onClose} disabled={isPending} size="sm">
+            <Button variant="outline" colorPalette="gray" onClick={onClose} disabled={isPending} size="sm">
               キャンセル
             </Button>
             <Button
