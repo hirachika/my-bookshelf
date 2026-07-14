@@ -66,7 +66,7 @@ function buildChartData(books: Book[]) {
   for (let i = 11; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    months.push({ key, label: `${d.getMonth() + 1}月` });
+    months.push({ key, label: `${d.getMonth() + 1}` });
   }
 
   const countByMonth: Record<string, number> = {};
@@ -106,7 +106,7 @@ const BarLabel = ({ x = 0, y = 0, width = 0, value = 0 }: LabelProps) => {
   if (!value) return null;
   return (
     <text x={x + width / 2} y={y - 3} textAnchor="middle" fontSize={9} fill="#f97316">
-      {value}冊
+      {value}
     </text>
   );
 };
@@ -162,7 +162,7 @@ export default function ReadingGraph({ books }: { books: Book[] }) {
                 cx="50%"
                 cy="50%"
                 outerRadius={70}
-                label={({ percent }: { percent?: number }) => percent ? `${(percent * 100).toFixed(0)}%` : ""}
+                label={({ percent }: { percent?: number }) => (percent ? `${(percent * 100).toFixed(0)}%` : "")}
                 labelLine={false}
                 fontSize={10}
               >
